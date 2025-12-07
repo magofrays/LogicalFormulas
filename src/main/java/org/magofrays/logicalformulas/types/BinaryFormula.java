@@ -1,14 +1,13 @@
 package org.magofrays.logicalformulas.types;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
+@NoArgsConstructor
 public class BinaryFormula extends Formula{
     private Formula left;
     private Connective connective;
@@ -20,4 +19,10 @@ public class BinaryFormula extends Formula{
         }
         return "(%s %s %s)".formatted(left, connective.value, right);
     }
+
+    @Override
+    public String getValue(){
+        return "(%s %s %s)".formatted(left, connective.value, right);
+    }
+
 }

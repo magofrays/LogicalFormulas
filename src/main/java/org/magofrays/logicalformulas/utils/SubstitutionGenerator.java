@@ -5,18 +5,20 @@ import org.magofrays.logicalformulas.types.Axiom;
 import org.magofrays.logicalformulas.types.BinaryFormula;
 import org.magofrays.logicalformulas.types.Formula;
 import org.magofrays.logicalformulas.types.Variable;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+@Component
 public class SubstitutionGenerator {
 
     public List<Map<String, Formula>> createSubstitutionsForAxiom(Formula formula, Axiom axiom, Integer num){
         var axiomVariables = excludeVariables(axiom.getFormula());
         var allParts = excludeParts(formula);
-        return createAllSubstitutions(allParts, axiomVariables, num);
+        return createSubstitutions(allParts, axiomVariables, num);
     }
 
-    public List<Map<String, Formula>> createAllSubstitutions(List<Formula> parts, Set<String> variables, Integer num) {
+    public List<Map<String, Formula>> createSubstitutions(List<Formula> parts, Set<String> variables, Integer num) {
         List<Map<String, Formula>> substitutions = new ArrayList<>();
         var variArr = variables.toArray();
 
@@ -76,10 +78,14 @@ public class SubstitutionGenerator {
     public List<Formula> excludeParts(Formula formula){
         Stack<Formula> stack = new Stack<>();
         List<Formula> parts = new ArrayList<>();
+        Set<Formula> uniqueParts = new HashSet<>();
         stack.push(formula);
         while(!stack.empty()){
             var curFormula = stack.pop();
-            parts.add(curFormula);
+            if(!uniqueParts.contains(curFormula)){
+                uniqueParts.add(curFormula);
+                parts.add(curFormula);
+            }
             if(curFormula instanceof BinaryFormula binaryFormula){
                 stack.push(binaryFormula.getLeft());
                 stack.push(binaryFormula.getRight());
@@ -101,14 +107,7 @@ public class SubstitutionGenerator {
                 stack.push(binaryFormula.getRight());
             }
             else if(curFormula instanceof Variable variable){
-                if(variable.isNegative()){
-                    variable.setNegative(false);
-                    variables.add(variable.toString());
-                    variable.setNegative(true);
-                }
-                else{
-                    variables.add(variable.toString());
-                }
+                variables.add(variable.getValue());
             }
         }
         return variables;

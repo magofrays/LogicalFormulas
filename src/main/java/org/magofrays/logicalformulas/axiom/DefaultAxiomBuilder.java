@@ -1,4 +1,4 @@
-package org.magofrays.logicalformulas.utils;
+package org.magofrays.logicalformulas.axiom;
 
 import org.magofrays.logicalformulas.types.Axiom;
 import org.magofrays.logicalformulas.types.BinaryFormula;

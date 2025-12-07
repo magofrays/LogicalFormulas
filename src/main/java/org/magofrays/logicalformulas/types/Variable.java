@@ -5,9 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 @EqualsAndHashCode(callSuper = true)
-@Builder
+@SuperBuilder
 @Data
 @AllArgsConstructor
 public class Variable extends Formula{
@@ -19,5 +20,9 @@ public class Variable extends Formula{
             return "¬" + value;
         }
         return value;
+    }
+
+    public String negValue(){
+        return "¬" + value;
     }
 }
