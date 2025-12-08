@@ -1,5 +1,6 @@
 package org.magofrays.logicalformulas.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.magofrays.logicalformulas.types.Axiom;
 import org.magofrays.logicalformulas.types.BinaryFormula;
 import org.magofrays.logicalformulas.types.Formula;
@@ -8,11 +9,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+
+@Slf4j
 @Component
 public class AxiomSubstituter {
 
     public Formula applySubstitution(Axiom axiom, Map<String, Formula> substitution){
-        return substituteFormula(axiom.getFormula(), substitution);
+        var substitutionResult = substituteFormula(axiom.getFormula(), substitution);
+        log.debug("Подставляем в аксиому {} подстановку {}. Результат: {}", axiom.getFormula(), substitution, substitutionResult);
+        return substitutionResult;
     }
 
     private Formula substituteFormula(Formula pattern, Map<String, Formula> substitution){
