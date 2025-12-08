@@ -6,7 +6,7 @@ spring:
 logging:
   level:
     root: INFO
-    org.magofrays.logicalformulas: INFO
+    org.magofrays.logicalformulas: DEBUG
     org.springframework: WARN
 
   pattern:
