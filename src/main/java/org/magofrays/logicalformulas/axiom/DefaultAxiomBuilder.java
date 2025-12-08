@@ -4,10 +4,12 @@ import org.magofrays.logicalformulas.types.Axiom;
 import org.magofrays.logicalformulas.types.BinaryFormula;
 import org.magofrays.logicalformulas.types.Connective;
 import org.magofrays.logicalformulas.types.Variable;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class DefaultAxiomBuilder {
     public List<Axiom> buildAxioms() {
         List<Axiom> axioms = new ArrayList<>();

@@ -1,6 +1,7 @@
 package org.magofrays.logicalformulas.utils;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.magofrays.logicalformulas.types.BinaryFormula;
 import org.magofrays.logicalformulas.types.Connective;
 import org.magofrays.logicalformulas.types.Formula;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class Deduction {
@@ -17,7 +19,6 @@ public class Deduction {
     private final ImpliesConverter impliesConverter;
     Random random = new Random();
 
-    // ПРОСТО ДВА КЭША
     private final Map<Formula, Optional<Map<String, Formula>>> patternCache = new HashMap<>();
     private final Set<Formula> generatedResults = new HashSet<>();
 
@@ -31,7 +32,7 @@ public class Deduction {
         List<Formula> newPremises = new ArrayList<>();
 
         for(var premise: premises){
-            // КЭШ 1: паттерн-матч
+            log.trace("Попытка применить теорему дедукции к посылке: {}", premise);
             Optional<Map<String, Formula>> result = patternCache.get(premise);
             if(result == null){
                 result = patternFinder.findPatternMatch(premise, pattern);
@@ -43,27 +44,34 @@ public class Deduction {
                 var left = patterns.get("A");
                 var clauses = cnfConverter.fromImpliesToClauses(left);
                 if(clauses.isEmpty()) continue;
-
                 int randomClauseIndex = random.nextInt(clauses.size());
                 var chosenFormula = clauses.get(randomClauseIndex);
                 clauses.remove(randomClauseIndex);
                 var right = patterns.get("B");
-                var newLeft = impliesConverter.toImplies(
-                        cnfConverter.fromClausesToFormula(clauses)
-                );
                 var newRight = BinaryFormula.builder()
                         .left(chosenFormula)
                         .connective(Connective.IMPLIES)
                         .right(right)
                         .build();
-                var newPremise = BinaryFormula.builder()
-                        .left(newLeft)
-                        .connective(Connective.IMPLIES)
-                        .right(newRight)
-                        .build();
+                Formula newPremise;
+                if(!clauses.isEmpty()) {
+                    var newLeft = impliesConverter.toImplies(
+                            cnfConverter.fromClausesToFormula(clauses)
+                    );
 
-                // КЭШ 2: проверка дубликатов
+
+                    newPremise = BinaryFormula.builder()
+                            .left(newLeft)
+                            .connective(Connective.IMPLIES)
+                            .right(newRight)
+                            .build();
+
+                }
+                else{
+                    newPremise = newRight;
+                }
                 if(!generatedResults.contains(newPremise)){
+                    log.debug("Применена теорема дедукции для посылки: {}, Новая посылка: {}", premise, newPremise);
                     newPremises.add(newPremise);
                     generatedResults.add(newPremise);
                 }
@@ -72,7 +80,6 @@ public class Deduction {
         return newPremises;
     }
 
-    // Для очистки при новом доказательстве
     public void clearCache(){
         patternCache.clear();
         generatedResults.clear();

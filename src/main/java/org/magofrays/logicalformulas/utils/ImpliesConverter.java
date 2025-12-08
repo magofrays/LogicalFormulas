@@ -3,6 +3,7 @@ package org.magofrays.logicalformulas.utils;
 import org.magofrays.logicalformulas.types.BinaryFormula;
 import org.magofrays.logicalformulas.types.Connective;
 import org.magofrays.logicalformulas.types.Formula;
+import org.magofrays.logicalformulas.types.Variable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -36,9 +37,15 @@ public class ImpliesConverter {
                         impl.setNegative(!impl.isNegative());
                     }
                     return impl;
+                case IMPLIES:
+                    return BinaryFormula.builder()
+                            .left(leftConv)
+                            .connective(Connective.IMPLIES)
+                            .right(rightConv)
+                            .build();
             }
         }
-        return formula;
+        return Variable.builder().isNegative(formula.isNegative()).value(formula.getValue()).build();
     }
 
 }

@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.magofrays.logicalformulas.axiom.DefaultAxiomBuilder;
 import org.magofrays.logicalformulas.types.Axiom;
 import org.magofrays.logicalformulas.types.Formula;
-import org.magofrays.logicalformulas.utils.AxiomSubstituter;
-import org.magofrays.logicalformulas.utils.Deduction;
-import org.magofrays.logicalformulas.utils.ModusPonens;
-import org.magofrays.logicalformulas.utils.SubstitutionGenerator;
+import org.magofrays.logicalformulas.utils.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -23,13 +20,13 @@ public class SimpleAlgorithm {
     private final ModusPonens modusPonens;
     private final SubstitutionGenerator substitutionGenerator;
     private final AxiomSubstituter axiomSubstituter;
+    private final ImpliesConverter impliesConverter;
 
 
 
-    public void prove(Formula formula){
-        List<Axiom> axioms = new DefaultAxiomBuilder().buildAxioms();
+    public void prove(Formula formula, List<Axiom> axioms){
         Set<Formula> allPremises = new HashSet<>();
-
+        formula = impliesConverter.toImplies(formula);
         for(var axiom : axioms) {
             var subs = substitutionGenerator.createSubstitutionsForAxiom(formula, axiom, 100); // ограничим
             for(var sub: subs){
@@ -37,34 +34,31 @@ public class SimpleAlgorithm {
             }
         }
 
-        int maxSteps = 1000; // защита от бесконечного цикла
+        int maxSteps = 1000;
         for(int step = 0; step < maxSteps; step++){
             if(findFormula(allPremises, formula)){
                 log.info("Формула была найдена: {}", formula);
                 return;
             }
-
             List<Formula> currentList = new ArrayList<>(allPremises);
-
-            // Применяем MP
+            log.info("Используем правило вывода");
             var mpResults = modusPonens.findModusPonens(currentList);
             allPremises.addAll(mpResults);
-
-            // Применяем дедукцию (не каждый шаг, чтобы не плодить)
             if(step % 3 == 0){
+                log.info("Используем теорему дедукции");
                 var deductionResults = deduction.randomDeduct(currentList);
                 allPremises.addAll(deductionResults);
             }
 
-            log.debug("Step {}: {} formulas", step, allPremises.size());
+            log.info("Step {}: {} formulas", step, allPremises.size());
 
-            if(allPremises.size() > 10000){ // защита от памяти
-                log.warn("Too many formulas, stopping");
+            if(allPremises.size() > 10000){
+                log.info("Too many formulas, stopping");
                 break;
             }
         }
 
-        log.warn("Failed to prove {}", formula);
+        log.info("Failed to prove {}", formula);
     }
 
     public boolean findFormula(Collection<Formula> premises, Formula formula){

@@ -29,11 +29,13 @@ public class CNFConverter {
 
     public Formula fromClausesToFormula(List<Formula> clauses) {
 
+        if(clauses.size() == 0){
+            return null;
+        }
         if (clauses.size() == 1) {
             return clauses.get(0);
         }
 
-        // Объединяем все клаузы через AND
         Formula result = clauses.get(0);
 
         for (int i = 1; i < clauses.size(); i++) {
