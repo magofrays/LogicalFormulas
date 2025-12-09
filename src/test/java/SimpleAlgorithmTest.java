@@ -29,52 +29,52 @@ public class SimpleAlgorithmTest {
     @Test
     public void testAxiomsA4() {
         var axiom = proveAxioms.get(0);
-        log.info("Доказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
+        log.info("\nДоказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
         simpleAlgorithm.prove(axiom.getFormula(), defaultAxiomBuilder.buildAxioms());
     }
 
     @Test
     public void testAxiomsA5(){
         var axiom = proveAxioms.get(1);
-        log.info("Доказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
+        log.info("\nДоказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
         simpleAlgorithm.prove(axiom.getFormula(), defaultAxiomBuilder.buildAxioms());
     }
 
     @Test
     public void testAxiomsA6(){
         var axiom = proveAxioms.get(2);
-        log.info("Доказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
+        log.info("\nДоказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
         simpleAlgorithm.prove(axiom.getFormula(), defaultAxiomBuilder.buildAxioms());
     }
 
     @Test
     public void testAxiomsA7(){
         var axiom = proveAxioms.get(3);
-        log.info("Доказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
+        log.info("\nДоказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
         simpleAlgorithm.prove(axiom.getFormula(), defaultAxiomBuilder.buildAxioms());
     }
     @Test
     public void testAxiomsA8(){
         var axiom = proveAxioms.get(4);
-        log.info("Доказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
+        log.info("\nДоказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
         simpleAlgorithm.prove(axiom.getFormula(), defaultAxiomBuilder.buildAxioms());
     }
     @Test
     public void testAxiomsA9(){
         var axiom = proveAxioms.get(5);
-        log.info("Доказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
+        log.info("\nДоказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
         simpleAlgorithm.prove(axiom.getFormula(), defaultAxiomBuilder.buildAxioms());
     }
     @Test
     public void testAxiomsA10(){
         var axiom = proveAxioms.get(6);
-        log.info("Доказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
+        log.info("\nДоказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
         simpleAlgorithm.prove(axiom.getFormula(), defaultAxiomBuilder.buildAxioms());
     }
     @Test
     public void testAxiomsA11(){
         var axiom = proveAxioms.get(7);
-        log.info("Доказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
+        log.info("\nДоказываем аксиому {}: {}", axiom.getName(), axiom.getFormula());
         simpleAlgorithm.prove(axiom.getFormula(), defaultAxiomBuilder.buildAxioms());
     }
 }

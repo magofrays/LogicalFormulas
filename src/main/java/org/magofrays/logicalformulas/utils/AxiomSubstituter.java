@@ -1,5 +1,6 @@
 package org.magofrays.logicalformulas.utils;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.magofrays.logicalformulas.types.Axiom;
 import org.magofrays.logicalformulas.types.BinaryFormula;
@@ -12,7 +13,9 @@ import java.util.Map;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AxiomSubstituter {
+    private final FormulaCopier copier;
 
     public Formula applySubstitution(Axiom axiom, Map<String, Formula> substitution){
         var substitutionResult = substituteFormula(axiom.getFormula(), substitution);
@@ -29,7 +32,7 @@ public class AxiomSubstituter {
                     .build();
         }
         else if(pattern instanceof Variable varPattern){
-            return substitution.get(varPattern.getValue());
+            return copier.deepCopy(substitution.get(varPattern.getValue()));
         }
         throw new RuntimeException("Impossible magic");
     }

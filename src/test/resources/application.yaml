@@ -10,8 +10,8 @@ logging:
     org.springframework: WARN
 
   pattern:
-    console: "%d{HH:mm:ss.SSS} %clr(%-5level) %clr([%thread]){blue} %clr(%-40logger{40}){cyan} : %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{HH:mm:ss.SSS}: %msg%n"
+    file: "%d{HH:mm:ss.SSS}: %msg%n"
 
   file:
     name: logs/app.log

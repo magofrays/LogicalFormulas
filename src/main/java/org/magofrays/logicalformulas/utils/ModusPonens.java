@@ -16,10 +16,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ModusPonens {
     private final PatternFinder patternFinder;
-
-    // Кэш для уже найденных формул по MP
     private final Set<Formula> alreadyGenerated = new HashSet<>();
-    private final Map<Pair<Formula, Formula>, Formula> mpCache = new HashMap<>();
 
     Formula pattern = BinaryFormula.builder()
             .left(new Variable("A"))
@@ -29,49 +26,38 @@ public class ModusPonens {
 
     public List<Formula> findModusPonens(List<Formula> premises) {
         List<Formula> newFormulas = new ArrayList<>();
-
         for (int i = 0; i < premises.size(); i++) {
+            var AimpliesB = premises.get(i);
+            var result = patternFinder.findPatternMatch(AimpliesB, pattern);
+            if (!result.isPresent()) {
+                continue;
+            }
+            if(alreadyGenerated.contains(result.get().get("B"))){
+                continue;
+            }
             for (int j = 0; j < premises.size(); j++) {
                 if (i != j) {
-                    var A = premises.get(i);
-                    var AimpliesB = premises.get(j);
-                    tryApplyMP(A, AimpliesB).ifPresent(newFormulas::add);
+                    var A = premises.get(j);
+                    log.trace("Попытка найти соответствия для MP. Посылка 1: {}, Посылка 2 {}", A, AimpliesB);
+                    var patterns = result.get();
+                    if (patterns.get("A").equals(A)) {
+                        Formula B = patterns.get("B");
+                        alreadyGenerated.add(B);
+                        log.debug("Найдено соответствие для MP. Посылка 1: {}, Посылка с правилом вывода: {}, Новая посылка: {}", A, AimpliesB, B);
+                        newFormulas.add(B);
+                    }
                 }
             }
         }
         return newFormulas;
     }
 
+    public void addAlreadyGenerated(Formula a){
+        alreadyGenerated.add(a);
+    }
+
     public void clearCache() {
         alreadyGenerated.clear();
-        mpCache.clear();
-    }
-
-    public void addToCache(Formula formula) {
-        alreadyGenerated.add(formula);
-    }
-
-
-    public Optional<Formula> tryApplyMP(Formula A, Formula AimpliesB) {
-        log.trace("Попытка найти соответствия для MP. Посылка 1: {}, Посылка 2 {}", A, AimpliesB);
-        Pair<Formula, Formula> key = new Pair<>(A, AimpliesB);
-
-        if (mpCache.containsKey(key)) {
-            return Optional.of(mpCache.get(key));
-        }
-
-        var result = patternFinder.findPatternMatch(AimpliesB, pattern);
-        if (result.isPresent()) {
-            var patterns = result.get();
-            if (patterns.get("A").equals(A)) {
-                Formula B = patterns.get("B");
-                mpCache.put(key, B);
-                log.debug("Найдено соответствие для MP. Посылка 1: {}, Посылка с правилом вывода: {}, Новая посылка: {}", A, AimpliesB, B);
-                return Optional.of(B);
-            }
-        }
-
-        return Optional.empty();
     }
 }
 

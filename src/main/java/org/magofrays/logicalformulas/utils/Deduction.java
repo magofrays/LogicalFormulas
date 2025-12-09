@@ -18,8 +18,7 @@ public class Deduction {
     private final CNFConverter cnfConverter;
     private final ImpliesConverter impliesConverter;
     Random random = new Random();
-
-    private final Map<Formula, Optional<Map<String, Formula>>> patternCache = new HashMap<>();
+    private final Set<Formula> patternCache = new HashSet<>();
     private final Set<Formula> generatedResults = new HashSet<>();
 
     Formula pattern = BinaryFormula.builder()
@@ -33,17 +32,15 @@ public class Deduction {
 
         for(var premise: premises){
             log.trace("Попытка применить теорему дедукции к посылке: {}", premise);
-            Optional<Map<String, Formula>> result = patternCache.get(premise);
-            if(result == null){
-                result = patternFinder.findPatternMatch(premise, pattern);
-                patternCache.put(premise, result);
+            if(patternCache.contains(premise)){
+                continue;
             }
-
+            patternCache.add(premise);
+            var result = patternFinder.findPatternMatch(premise, pattern);
             if(result.isPresent()){
                 var patterns = result.get();
                 var left = patterns.get("A");
                 var clauses = cnfConverter.fromImpliesToClauses(left);
-                if(clauses.isEmpty()) continue;
                 int randomClauseIndex = random.nextInt(clauses.size());
                 var chosenFormula = clauses.get(randomClauseIndex);
                 clauses.remove(randomClauseIndex);
@@ -58,14 +55,11 @@ public class Deduction {
                     var newLeft = impliesConverter.toImplies(
                             cnfConverter.fromClausesToFormula(clauses)
                     );
-
-
                     newPremise = BinaryFormula.builder()
                             .left(newLeft)
                             .connective(Connective.IMPLIES)
                             .right(newRight)
                             .build();
-
                 }
                 else{
                     newPremise = newRight;
@@ -78,6 +72,10 @@ public class Deduction {
             }
         }
         return newPremises;
+    }
+
+    public void addAlreadyGenerated(Formula a){
+        generatedResults.add(a);
     }
 
     public void clearCache(){

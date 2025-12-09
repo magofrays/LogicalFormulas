@@ -4,40 +4,27 @@ import org.magofrays.logicalformulas.types.*;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Component
 public class CNFConverter {
 
-    /**
-     * Преобразует формулу только с IMPLIES в КНФ (список клауз)
-     * Каждая клауза - Formula (содержащая только AND, OR и отрицания)
-     */
     public List<Formula> fromImpliesToClauses(Formula formula) {
-        // Шаг 1: Устранить импликации (преобразовать в OR)
         Formula withoutImpl = eliminateImplications(formula);
-
-        // Шаг 2: Привести к ННФ (отрицания только перед переменными)
         Formula nnf = toNNF(withoutImpl);
-
-        // Шаг 3: Преобразовать в КНФ
         Formula cnf = toCNF(nnf);
-
-        // Шаг 4: Разделить на клаузы (по AND)
         return splitIntoClauses(cnf);
     }
 
     public Formula fromClausesToFormula(List<Formula> clauses) {
-
         if(clauses.size() == 0){
             return null;
         }
         if (clauses.size() == 1) {
             return clauses.get(0);
         }
-
         Formula result = clauses.get(0);
-
         for (int i = 1; i < clauses.size(); i++) {
             result = BinaryFormula.builder()
                     .left(result)
@@ -45,7 +32,6 @@ public class CNFConverter {
                     .right(clauses.get(i))
                     .build();
         }
-
         return result;
     }
 
@@ -62,16 +48,14 @@ public class CNFConverter {
             if (bin.getConnective() == Connective.IMPLIES) {
                 // A → B ≡ ¬A ∨ B
                 Formula negLeft = negate(left);
-                // Создаем OR через отрицание и IMPLIES (временное представление)
                 BinaryFormula orFormula = BinaryFormula.builder()
                         .left(negLeft)
                         .connective(Connective.IMPLIES)
                         .right(right)
                         .build();
-                orFormula.setNegative(false); // Это будет OR
+                orFormula.setNegative(false);
                 return orFormula;
             } else {
-                // Сохраняем другие связки
                 return BinaryFormula.builder()
                         .left(left)
                         .connective(bin.getConnective())
@@ -90,11 +74,8 @@ public class CNFConverter {
             BinaryFormula bin = (BinaryFormula) formula;
 
             if (bin.isNegative()) {
-                // Отрицание над бинарной формулой
                 return applyDeMorgan(bin);
             }
-
-            // Рекурсивно нормализуем подформулы
             Formula left = toNNF(bin.getLeft());
             Formula right = toNNF(bin.getRight());
 
@@ -114,13 +95,10 @@ public class CNFConverter {
         Connective connective = formula.getConnective();
 
         // ¬(A ∧ B) ≡ ¬A ∨ ¬B
-        // ¬(A ∨ B) ≡ ¬A ∧ ¬B
         if (connective == Connective.IMPLIES) {
             // Для IMPLIES: ¬(¬A → B) ≡ ¬(A ∨ B) ≡ ¬A ∧ ¬B
             Formula negLeft = negate(left);
             Formula negRight = negate(right);
-
-            // Создаем AND
             return BinaryFormula.builder()
                     .left(negLeft)
                     .connective(Connective.AND)
@@ -134,7 +112,7 @@ public class CNFConverter {
 
             return BinaryFormula.builder()
                     .left(negLeft)
-                    .connective(Connective.IMPLIES) // OR через IMPLIES
+                    .connective(Connective.IMPLIES)
                     .right(negRight)
                     .isNegative(false)
                     .build();
@@ -204,7 +182,6 @@ public class CNFConverter {
         }
         // Ни A, ни B не являются AND
         else {
-            // Просто A ∨ B
             return BinaryFormula.builder()
                     .left(A)
                     .connective(Connective.IMPLIES) // OR через IMPLIES
@@ -214,25 +191,22 @@ public class CNFConverter {
     }
 
     private List<Formula> splitIntoClauses(Formula formula) {
-        List<Formula> clauses = new ArrayList<>();
+        Set<Formula> clauses = new HashSet<>();
 
         if (formula instanceof BinaryFormula) {
             BinaryFormula bin = (BinaryFormula) formula;
 
             if (bin.getConnective() == Connective.AND) {
-                // Разделяем по AND
                 clauses.addAll(splitIntoClauses(bin.getLeft()));
                 clauses.addAll(splitIntoClauses(bin.getRight()));
             } else {
-                // Это клауза (дизъюнкция литералов)
                 clauses.add(formula);
             }
         } else {
-            // Одиночная переменная - тоже клауза
             clauses.add(formula);
         }
 
-        return clauses;
+        return new ArrayList<>(clauses);
     }
 
     private Formula negate(Formula formula) {
