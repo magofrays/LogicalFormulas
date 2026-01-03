@@ -35,19 +35,18 @@ public class ModusPonens {
             if(alreadyGenerated.contains(result.get().get("B"))){
                 continue;
             }
-            for (int j = 0; j < premises.size(); j++) {
-                if (i != j) {
-                    var A = premises.get(j);
-                    log.trace("Попытка найти соответствия для MP. Посылка 1: {}, Посылка 2 {}", A, AimpliesB);
-                    var patterns = result.get();
-                    if (patterns.get("A").equals(A)) {
-                        Formula B = patterns.get("B");
-                        alreadyGenerated.add(B);
-                        log.debug("Найдено соответствие для MP. Посылка 1: {}, Посылка с правилом вывода: {}, Новая посылка: {}", A, AimpliesB, B);
-                        newFormulas.add(B);
-                    }
-                }
+//            for (int j = 0; j < premises.size(); j++) {
+//                if (i != j) {
+            log.trace("Попытка найти соответствия для MP. Посылка : {}", AimpliesB);
+            var patterns = result.get();
+            if (alreadyGenerated.contains(patterns.get("A"))) {
+                Formula B = patterns.get("B");
+                alreadyGenerated.add(B);
+                log.debug("Найдено соответствие для MP. Посылка 1: {}, Посылка с правилом вывода: {}, Новая посылка: {}", patterns.get("A"), AimpliesB, B);
+                newFormulas.add(B);
             }
+//                }
+//            }
         }
         return newFormulas;
     }

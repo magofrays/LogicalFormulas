@@ -50,7 +50,7 @@ public class CNFConverter {
                 Formula negLeft = negate(left);
                 BinaryFormula orFormula = BinaryFormula.builder()
                         .left(negLeft)
-                        .connective(Connective.IMPLIES)
+                        .connective(Connective.OR)
                         .right(right)
                         .build();
                 orFormula.setNegative(false);
@@ -147,7 +147,7 @@ public class CNFConverter {
                         .connective(Connective.AND)
                         .right(rightCNF)
                         .build();
-            } else if (bin.getConnective() == Connective.IMPLIES) { // Это OR
+            } else if (bin.getConnective() == Connective.OR) { // Это OR
                 // (A ∨ B) нужно проверить дистрибутивность
                 return distributeOR(leftCNF, rightCNF);
             }
