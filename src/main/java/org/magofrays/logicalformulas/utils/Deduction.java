@@ -46,7 +46,7 @@ public class Deduction {
                 clauses.remove(randomClauseIndex);
                 var right = patterns.get("B");
                 var newRight = BinaryFormula.builder()
-                        .left(chosenFormula)
+                        .left(impliesConverter.toImplies(chosenFormula))
                         .connective(Connective.IMPLIES)
                         .right(right)
                         .build();
