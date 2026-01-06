@@ -184,7 +184,7 @@ public class CNFConverter {
         else {
             return BinaryFormula.builder()
                     .left(A)
-                    .connective(Connective.IMPLIES) // OR через IMPLIES
+                    .connective(Connective.OR)
                     .right(B)
                     .build();
         }
